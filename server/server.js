@@ -7,9 +7,7 @@ const path = require("path");
 const fs = require("fs");
 const d3 = require("d3");
 const _ = require("lodash");
-
 const compression = require("compression");
-
 const multer = require("multer");
 var cors = require("cors");
 
@@ -51,12 +49,16 @@ app.use(express.static("public"));
 let listingData = {};
 let contactsData = {};
 app.post("/upload-csvs", uploader.single("file"), (req, res) => {
-    const { filename } = req.file;
-    const filebath = `${__dirname}/uploads/${filename}`;
     if (req.file) {
         if (req.file.mimetype !== "text/csv") {
-            res.json({ message: "Only .csv files accepted!", error: true });
+            res.json({
+                message:
+                    "Only .csv files accepted! Please make sure you selected the right file",
+                error: true,
+            });
         }
+        const { filename } = req.file;
+        const filebath = `${__dirname}/uploads/${filename}`;
 
         fs.readFile(filebath, "utf8", function (error, data) {
             data = d3.csvParse(data);
@@ -72,28 +74,35 @@ app.post("/upload-csvs", uploader.single("file"), (req, res) => {
                     const avg = d3.mean(typeData, (d) => {
                         return d.price;
                     });
-                    return avg;
+                    return Math.round(avg);
                 }
                 // Get the AVG of the distribution of the makes
-                function distribution() {
-                    let counts = {};
-                    for (let i = 0; i < data.length; i++) {
-                        counts[data[i].make] = 1 + (counts[data[i].make] || 0);
-                    }
-                    for (let key in counts) {
-                        counts[key] = counts[key] * (100 / data.length);
-                    }
-                    return counts;
+
+                let counts = {};
+                for (let i = 0; i < data.length; i++) {
+                    counts[data[i].make] = 1 + (counts[data[i].make] || 0);
                 }
+                for (let key in counts) {
+                    counts[key] = counts[key] * (100 / data.length);
+                }
+                const sortableCounts = [];
+                for (let key in counts) {
+                    sortableCounts.push([key, counts[key]]);
+                }
+                const distributionObj = sortableCounts.map((i) => {
+                    return {
+                        make: i[0],
+                        avg: Math.round(i[1]),
+                    };
+                });
+
                 res.json({
                     average: [
-                        {
-                            private: avg("private"),
-                            dealer: avg("dealer"),
-                            other: avg("other"),
-                        },
+                        { type: "private", avg: avg("private") },
+                        { type: "dealer", avg: avg("dealer") },
+                        { type: "other", avg: avg("other") },
                     ],
-                    percentage: distribution(),
+                    percentage: distributionObj,
                 });
             } else if (data.columns.includes("listing_id")) {
                 contactsData.contacts = data;
@@ -127,10 +136,6 @@ app.post("/upload-csvs", uploader.single("file"), (req, res) => {
                     return d.price;
                 });
 
-                // res.json({ avg: avg });
-                //######################
-
-                // change time format
                 // 4- REPORTS PER MONTH!
                 // change time format
                 const formatMonth = d3.timeFormat("%m/%Y");
@@ -187,7 +192,7 @@ app.post("/upload-csvs", uploader.single("file"), (req, res) => {
                         contact.price = result[0].price;
                         contact.make = result[0].make;
                         contact.mileage = result[0].mileage;
-                        contact.price = result[0].seller_type;
+                        contact.seller_type = result[0].seller_type;
                     });
 
                     reports[month] = mostContactedObj;
@@ -195,7 +200,11 @@ app.post("/upload-csvs", uploader.single("file"), (req, res) => {
                 for (let i = 0; i < dates.length; i++) {
                     getReportFor(dates[i]);
                 }
-                console.log(reports);
+
+                res.json({
+                    highTAverage: Math.round(avg),
+                    monthlyReports: reports,
+                });
             } else {
                 res.json({
                     message: "This is not the correct file",
@@ -204,7 +213,7 @@ app.post("/upload-csvs", uploader.single("file"), (req, res) => {
             }
         });
     } else {
-        res.json({ error: true });
+        res.json({ message: "Make sure you delected a file", error: true });
     }
 });
 
