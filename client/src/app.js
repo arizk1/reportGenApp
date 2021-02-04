@@ -150,7 +150,7 @@ export default function App() {
                 <>
                     <h1>Percentual Distribution of available cars by Make</h1>
                     <h3>Month 01/2020</h3>
-                    <table className="avg-seller">
+                    <table className="report">
                         <tr>
                             <th>Ranking</th>
                             <th>Listing Id</th>
@@ -173,7 +173,7 @@ export default function App() {
                         )}
                     </table>
                     <h3>Month 02/2020</h3>
-                    <table className="avg-seller">
+                    <table className="report">
                         <tr>
                             <th>Ranking</th>
                             <th>Listing Id</th>
@@ -196,7 +196,7 @@ export default function App() {
                         )}
                     </table>
                     <h3>Months 03/2020</h3>
-                    <table className="avg-seller">
+                    <table className="report">
                         <tr>
                             <th>Ranking</th>
                             <th>Listing Id</th>
@@ -219,7 +219,7 @@ export default function App() {
                         )}
                     </table>
                     <h3>Month 04/2020</h3>
-                    <table className="avg-seller">
+                    <table className="report">
                         <tr>
                             <th>Ranking</th>
                             <th>Listing Id</th>
@@ -242,7 +242,7 @@ export default function App() {
                         )}
                     </table>
                     <h3>Month 05/2020</h3>
-                    <table className="avg-seller">
+                    <table className="report">
                         <tr>
                             <th>Ranking</th>
                             <th>Listing Id</th>
@@ -265,7 +265,7 @@ export default function App() {
                         )}
                     </table>
                     <h3>Month 06/2020</h3>
-                    <table className="avg-seller">
+                    <table className="report">
                         <tr>
                             <th>Ranking</th>
                             <th>Listing Id</th>

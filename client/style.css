@@ -18,3 +18,18 @@ th {
 tr:nth-child(even) {
     background-color: #dddddd;
 }
+
+button {
+    background: royalblue;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    margin-left: 5px;
+}
+
+button:hover {
+    background: #21086d;
+}
