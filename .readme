@@ -1,0 +1,20 @@
+The application is designed to be a single page report generator using React. 
+
+
+1) clone the repository
+
+2) Install the dependencies, make sure you are on the right directory
+    npm install 
+
+3) on your local machine, start the server on the terminal, make sure you are on the right directory
+    npm start 
+
+4) You will need to also run the webpack-dev-server, open another terminal, make sure you are on the right directory
+    npm run dev:client
+
+5)  the server listens to port 3000, open your browser
+    http://localhost:3000/
+
+6) Upload first the listings.csv and then the contacts.csv
+
+6)Given the timeframe, I did not have much time to work on design or testing
