@@ -9,7 +9,6 @@ const d3 = require("d3");
 const _ = require("lodash");
 
 const compression = require("compression");
-const db = require("./db");
 
 const multer = require("multer");
 var cors = require("cors");
@@ -117,20 +116,22 @@ app.post("/upload-csvs", uploader.single("file"), (req, res) => {
                         };
                     });
 
-                // mostContactedObj.forEach((contact) => {
-                //     let result = listingData.listings.filter((listing) => {
-                //         return listing.id === contact.id;
-                //     });
-                //     contact.price = result[0].price;
-                // });
+                mostContactedObj.forEach((contact) => {
+                    let result = listingData.listings.filter((listing) => {
+                        return listing.id === contact.id;
+                    });
+                    contact.price = result[0].price;
+                });
 
-                // const avg = d3.mean(mostContactedObj, (d) => {
-                //     return d.price;
-                // });
+                const avg = d3.mean(mostContactedObj, (d) => {
+                    return d.price;
+                });
 
                 // res.json({ avg: avg });
                 //######################
 
+                // change time format
+                // 4- REPORTS PER MONTH!
                 // change time format
                 const formatMonth = d3.timeFormat("%m/%Y");
                 const contacts = data.map((d) => {
@@ -139,8 +140,62 @@ app.post("/upload-csvs", uploader.single("file"), (req, res) => {
                         contact_date: formatMonth(d.contact_date),
                     };
                 });
-                //
-                console.log(contacts);
+                //sort dates per month
+                const sortedContacts = contacts.sort((a, b) => {
+                    return (
+                        a.contact_date.substring(0, 2) -
+                        b.contact_date.substring(0, 2)
+                    );
+                });
+                //group listing Ids per month suing loadash
+                var contactsByDate = _.groupBy(sortedContacts, "contact_date");
+
+                const dates = [
+                    "01/2020",
+                    "02/2020",
+                    "03/2020",
+                    "04/2020",
+                    "05/2020",
+                    "06/2020",
+                ];
+                const reports = {};
+                function getReportFor(month) {
+                    const singelreport = contactsByDate[month];
+                    let counts = {};
+                    for (let i = 0; i < singelreport.length; i++) {
+                        counts[singelreport[i].id] =
+                            1 + (counts[singelreport[i].id] || 0);
+                    }
+
+                    const sortable = [];
+                    for (let key in counts) {
+                        sortable.push([key, counts[key]]);
+                    }
+                    const mostContactedObj = sortable
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(1, 6)
+                        .map((i) => {
+                            return {
+                                id: i[0],
+                                count: i[1],
+                            };
+                        });
+                    mostContactedObj.forEach((contact) => {
+                        let result = listingData.listings.filter((listing) => {
+                            return listing.id === contact.id;
+                        });
+                        contact.price = result[0].price;
+                        contact.make = result[0].make;
+                        contact.mileage = result[0].mileage;
+                        contact.price = result[0].seller_type;
+                    });
+
+                    reports[month] = mostContactedObj;
+                }
+                for (let i = 0; i < dates.length; i++) {
+                    getReportFor(dates[i]);
+                }
+                console.log(reports);
             } else {
                 res.json({
                     message: "This is not the correct file",
