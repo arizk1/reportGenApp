@@ -1,5 +1,5 @@
-DROP  TABLE IF EXISTS listings;
-DROP  TABLE IF EXISTS contacts;
+-- DROP  TABLE IF EXISTS listings;
+-- DROP  TABLE IF EXISTS contacts;
 
 
 CREATE TABLE listings(
@@ -16,5 +16,6 @@ CREATE TABLE listings(
 CREATE TABLE contacts(
     id SERIAL PRIMARY KEY,
     listing_id INT REFERENCES listings(id),
-    contact_date TIMESTAMP 
+    contact_date VARCHAR(200) 
 );
+
